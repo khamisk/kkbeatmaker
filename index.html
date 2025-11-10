@@ -709,6 +709,17 @@
                 background: rgba(168, 85, 247, 0.95);
             }
         }
+
+        /* iOS-specific helper: show tiny step numbers inside boxes when body has .ios-on */
+        .ios-on .step::after {
+            content: attr(data-step-number);
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.18);
+            pointer-events: none;
+        }
     </style>
 </head>
 
@@ -796,6 +807,18 @@
             <div class="modal-actions" style="display:flex;justify-content:flex-end;margin-top:8px;gap:8px;">
                 <button id="importLoadBtn" class="btn small">Load</button>
                 <button id="importCloseBtn" class="btn ghost small">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- iOS audio notice modal -->
+    <div id="iosAudioNotice" class="text-modal-overlay" role="dialog" aria-modal="true">
+        <div class="text-modal">
+            <div style="font-weight:600;margin-bottom:8px;">iOS audio notice</div>
+            <div style="margin-bottom:8px;">On iOS devices audio may be blocked when the device is in Silent mode.
+                Please turn off Silent/Ring-Switch or enable sound to hear audio from this app.</div>
+            <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px;">
+                <button id="iosAudioOkBtn" class="btn small">Got it</button>
             </div>
         </div>
     </div>
@@ -981,6 +1004,34 @@
             fillColor = fillColor.trim();
             const fill = `linear-gradient(90deg, ${fillColor} ${pct}%, rgba(255,255,255,0.04) ${pct}%)`;
             el.style.background = fill;
+        }
+
+        // detect iOS (iPhone / iPad / iPod) including iPadOS which reports MacIntel
+        function detectIOS() {
+            try {
+                const ua = navigator.userAgent || navigator.vendor || window.opera || '';
+                const isIosUa = /iPad|iPhone|iPod/.test(ua);
+                const isTouchMac = (navigator.platform === 'MacIntel' && ('ontouchend' in document));
+                return isIosUa || isTouchMac;
+            } catch (e) { return false; }
+        }
+
+        function showIosAudioNoticeIfNeeded() {
+            if (!detectIOS()) return;
+            // add ios class to body so we can show step numbers
+            document.body.classList.add('ios-on');
+            const key = 'iosAudioNoticeDismissed_v1';
+            try {
+                const seen = localStorage.getItem(key);
+                if (seen) return;
+            } catch (e) { }
+            const overlay = document.getElementById('iosAudioNotice');
+            if (overlay) overlay.style.display = 'flex';
+            const ok = document.getElementById('iosAudioOkBtn');
+            if (ok) ok.addEventListener('click', () => {
+                try { localStorage.setItem(key, '1'); } catch (e) { }
+                overlay.style.display = 'none';
+            });
         }
 
         function buildHeader() {
@@ -1255,6 +1306,7 @@
                 cell.className = "step";
                 cell.dataset.trackId = track.id;
                 cell.dataset.stepIndex = stepIndex;
+                cell.dataset.stepNumber = (stepIndex + 1);
 
                 // main step interaction (coarse, toggles entire step)
                 cell.addEventListener("mousedown", (e) => {
@@ -1902,6 +1954,9 @@
                     applyLoadedState(data);
                 }
             } catch { }
+
+            // show iOS-specific audio notice (if applicable)
+            try { showIosAudioNoticeIfNeeded(); } catch (e) { }
         })();
 
         // wire export/import buttons (elements already present)
