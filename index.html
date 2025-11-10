@@ -22,8 +22,10 @@
             --danger: #f97373;
             --border: rgba(148, 163, 184, 0.25);
 
-            --step-width: 60px;
-            --step-height: 40px;
+            --step-width: 72px;
+            --step-height: 48px;
+            /* left column width for instrument cards */
+            --left-col-width: 320px;
             /* sub-dot is a ratio of the step size so it scales with step dimensions */
             --sub-size: calc(var(--step-height) * 0.18);
             --num-steps: 16;
@@ -49,11 +51,11 @@
         }
 
         .app {
-            width: 95vw;
-            max-width: 1400px;
+            width: 96vw;
+            max-width: 1600px;
             background: linear-gradient(145deg, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.9));
             border-radius: 18px;
-            padding: 20px;
+            padding: 28px;
             border: 1px solid var(--border);
             box-shadow:
                 0 24px 60px rgba(15, 23, 42, 0.9),
@@ -152,6 +154,51 @@
             width: 120px;
         }
 
+        /* rectangular-looking range inputs */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 12px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.04);
+            outline: none;
+            padding: 0;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-webkit-slider-runnable-track {
+            height: 12px;
+            border-radius: 6px;
+            background: transparent;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            background: #ffffff;
+            border-radius: 3px;
+            margin-top: -1px;
+            /* align thumb vertically */
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+        }
+
+        input[type="range"]::-moz-range-track {
+            height: 12px;
+            border-radius: 6px;
+            background: transparent;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
+            background: #ffffff;
+            border-radius: 3px;
+            border: none;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+        }
+
         .bpm-value {
             min-width: 40px;
             text-align: right;
@@ -199,12 +246,12 @@
         }
 
         .grid {
-            min-width: 720px;
+            min-width: calc(var(--left-col-width) + (var(--num-steps) * var(--step-width)));
         }
 
         .grid-header {
             display: grid;
-            grid-template-columns: 260px repeat(16, var(--step-width));
+            grid-template-columns: var(--left-col-width) repeat(var(--num-steps), var(--step-width));
             gap: 4px;
             margin-bottom: 6px;
             align-items: center;
@@ -224,10 +271,32 @@
 
         .row {
             display: grid;
-            grid-template-columns: 260px repeat(16, var(--step-width));
+            grid-template-columns: var(--left-col-width) repeat(var(--num-steps), var(--step-width));
             gap: 4px;
             margin-bottom: 6px;
             align-items: center;
+        }
+
+        /* drag handle and ready state */
+        .drag-handle {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.06);
+            opacity: 0;
+            margin-right: 8px;
+            transition: opacity 120ms ease, transform 120ms ease;
+            display: inline-block;
+        }
+
+        .row.drag-ready {
+            box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.08) inset;
+        }
+
+        .row.drag-ready .drag-handle {
+            opacity: 1;
+            transform: translateY(-1px);
+            background: rgba(168, 85, 247, 0.9);
         }
 
         /* drag & drop visuals for track rows */
@@ -243,11 +312,12 @@
         .instrument-info {
             display: flex;
             flex-direction: column;
-            gap: 4px;
-            padding: 6px 10px;
+            gap: 6px;
+            padding: 10px 12px;
             border-radius: 10px;
             border: 1px solid rgba(148, 163, 184, 0.35);
             background: linear-gradient(135deg, rgba(248, 250, 252, 0.02), rgba(15, 23, 42, 0.9));
+            min-height: calc(var(--step-height) + 8px);
         }
 
         .track-kick .instrument-info {
@@ -303,7 +373,7 @@
         }
 
         .volume-slider {
-            width: 84px;
+            width: 120px;
         }
 
         .pitch-row {
@@ -316,7 +386,7 @@
         }
 
         .pitch-slider {
-            width: 80px;
+            width: 110px;
         }
 
         .advanced-on .pitch-row {
@@ -648,7 +718,11 @@
                     { label: "kick04", file: "assets/kicks/kick04.wav" },
                     { label: "kick05", file: "assets/kicks/kick05.wav" },
                     { label: "kick06", file: "assets/kicks/kick06.wav" },
-                    { label: 'kick07 "phonk"', file: "assets/kicks/kick07.wav" }
+                    { label: 'kick07 "phonk"', file: "assets/kicks/kick07.wav" },
+                    { label: 'kick08 "hardstyle"', file: "assets/kicks/hardcore-hardstyle-kick.wav" },
+                    { label: 'kick09 "hardstyle2"', file: "assets/kicks/hardstyle-kick.wav" },
+                    { label: 'kick10 "hardstyle3"', file: "assets/kicks/hardstyle-kick-2_A_major.wav" },
+                    { label: 'kick11 "lofi"', file: "assets/kicks/lo-fi-kick_C_major.wav" }
                 ]
             },
             snare: {
@@ -659,7 +733,8 @@
                     { label: "snare 2 (phonk)", file: "assets/snares/metallic-phonk-snare.wav" },
                     { label: 'snare 3 "opium"', file: "assets/snares/opium-perc-lo-fi-snare.wav" },
                     { label: "snare 4 (trap)", file: "assets/snares/trap-type-snare.wav" },
-                    { label: "snare 5", file: "assets/snares/electro-snap-snare.wav" }
+                    { label: "snare 5", file: "assets/snares/electro-snap-snare.wav" },
+                    { label: 'snare 6 "arab"', file: "assets/snares/arab-percussion-loop-3.wav" }
                 ]
             },
             hat: {
@@ -693,7 +768,9 @@
                     { label: "camera flash", file: "assets/misc/camera_flash.wav" },
                     { label: '"jumpstyle kick"', file: "assets/misc/jumpstyle-kick.wav" },
                     { label: "phone fx", file: "assets/misc/phone-fx.wav" },
-                    { label: "scratch", file: "assets/misc/single-scratch-forth-back.wav" }
+                    { label: "scratch", file: "assets/misc/single-scratch-forth-back.wav" },
+                    { label: "arab drum1", file: "assets/misc/darbuka-2_120bpm.wav" },
+                    { label: "arab drum2", file: "assets/misc/darbuka-hit_140bpm_A_major.wav" }
                 ]
             }
         };
@@ -756,6 +833,23 @@
             document.documentElement.style.setProperty("--num-steps", STEPS);
         }
 
+        // update the visual fill of a range input so it looks like a rectangular progress bar
+        function updateRangeVisual(el) {
+            if (!el) return;
+            const min = parseFloat(el.min) || 0;
+            const max = parseFloat(el.max) || 100;
+            const val = parseFloat(el.value) || 0;
+            const pct = ((val - min) / (max - min)) * 100;
+            // allow per-element --fill-color (set on the slider) otherwise fallback to --accent
+            let fillColor = getComputedStyle(el).getPropertyValue('--fill-color');
+            if (!fillColor || !fillColor.trim()) {
+                fillColor = getComputedStyle(document.documentElement).getPropertyValue('--accent');
+            }
+            fillColor = fillColor.trim();
+            const fill = `linear-gradient(90deg, ${fillColor} ${pct}%, rgba(255,255,255,0.04) ${pct}%)`;
+            el.style.background = fill;
+        }
+
         function buildHeader() {
             gridHeader.innerHTML = "";
             const labelCell = document.createElement("div");
@@ -816,9 +910,10 @@
             const row = document.createElement("div");
             row.className = "row track-" + typeConfig.id;
             row.dataset.trackId = track.id;
-            row.draggable = true;
+            // start non-draggable; will enable after a short hold (to avoid accidental drags when interacting with sliders)
+            row.draggable = false;
 
-            // Drag events for row reordering
+            // Drag events for row reordering (dragstart/dragend stay the same, but row becomes draggable only after a short hold)
             row.addEventListener('dragstart', (e) => {
                 e.dataTransfer.setData('text/plain', track.id);
                 row.classList.add('dragging');
@@ -828,6 +923,9 @@
                 row.classList.remove('dragging');
                 // cleanup any drag-over classes
                 document.querySelectorAll('.row.drag-over').forEach(r => r.classList.remove('drag-over'));
+                // disable draggable again until next hold
+                row.draggable = false;
+                row.classList.remove('drag-ready');
             });
 
             row.addEventListener('dragover', (e) => {
@@ -849,12 +947,54 @@
                 }
             });
 
+            // Hold-to-enable dragging: prevent accidental drags when interacting with sliders and buttons
+            let holdTimer = null;
+            const HOLD_MS = 350;
+
+            row.addEventListener('mousedown', (e) => {
+                // only left-click
+                if (e.button !== 0) return;
+                // ignore if interaction was on interactive controls (sliders, buttons, selects, steps)
+                if (e.target.closest('input') || e.target.closest('select') || e.target.closest('button') || e.target.closest('.step') || e.target.closest('.step-sub')) {
+                    return;
+                }
+                // start hold timer
+                holdTimer = setTimeout(() => {
+                    row.draggable = true;
+                    row.classList.add('drag-ready');
+                }, HOLD_MS);
+            });
+
+            // clear timer on mouseup / leave
+            const clearHold = () => { if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; } };
+            row.addEventListener('mouseup', clearHold);
+            row.addEventListener('mouseleave', clearHold);
+            row.addEventListener('mouseout', clearHold);
+
+            // touch support
+            row.addEventListener('touchstart', (e) => {
+                if (e.target.closest('input') || e.target.closest('select') || e.target.closest('button') || e.target.closest('.step') || e.target.closest('.step-sub')) {
+                    return;
+                }
+                holdTimer = setTimeout(() => {
+                    row.draggable = true;
+                    row.classList.add('drag-ready');
+                }, HOLD_MS);
+            }, { passive: true });
+            row.addEventListener('touchend', clearHold);
+
             const info = document.createElement("div");
             info.className = "instrument-info";
 
             // Header line: name + controls (volume, mute, remove)
             const headerLine = document.createElement("div");
             headerLine.className = "instrument-header-line";
+
+            // small drag handle (becomes visible once hold threshold is reached)
+            const dragHandleEl = document.createElement('div');
+            dragHandleEl.className = 'drag-handle';
+            // insert handle at start of headerLine
+            headerLine.appendChild(dragHandleEl);
 
             const nameEl = document.createElement("div");
             nameEl.className = "instrument-name";
@@ -870,6 +1010,17 @@
             volumeSlider.value = "100";
             volumeSlider.className = "volume-slider";
 
+            // set a contrasting color per track type for the volume slider fill
+            const typeColorMap = {
+                kick: '#a855f7',   // purple
+                snare: '#f97373',  // red/pink
+                hat: '#3b82f6',    // blue
+                bass: '#34d399',   // green
+                misc: '#f59e0b'    // amber
+            };
+            const fillColor = typeColorMap[typeConfig.id] || getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+            volumeSlider.style.setProperty('--fill-color', fillColor);
+
             // numeric label for volume
             const volumeValueEl = document.createElement('span');
             volumeValueEl.className = 'value-label';
@@ -880,6 +1031,7 @@
                 track.volume = v;
                 if (volumeValueEl) volumeValueEl.textContent = Math.round(v * 100);
                 updateTrackGain(track);
+                updateRangeVisual(volumeSlider);
             });
 
             const muteBtn = document.createElement("button");
@@ -950,6 +1102,7 @@
             pitchSlider.addEventListener("input", () => {
                 track.pitch = parseInt(pitchSlider.value, 10) || 0;
                 if (pitchValueEl) pitchValueEl.textContent = track.pitch;
+                updateRangeVisual(pitchSlider);
             });
 
             pitchRow.appendChild(pitchLabel);
@@ -1048,6 +1201,9 @@
             // preload default sample
             const defaultFile = track.options[track.selectedIndex].file;
             preloadSample(defaultFile);
+            // make the sliders visually show their current value as filled rectangles
+            updateRangeVisual(volumeSlider);
+            updateRangeVisual(pitchSlider);
             updateTrackGain(track);
             updateTrackMuteState(track);
 
@@ -1365,6 +1521,7 @@
             bpmSlider.value = bpm;
             bpmValue.textContent = bpm;
             Tone.Transport.bpm.value = bpm;
+            updateRangeVisual(bpmSlider);
 
             // advanced
             // keep advanced mode on by default (no simple mode)
@@ -1390,12 +1547,14 @@
 
                     if (track.elements.volumeSlider) {
                         track.elements.volumeSlider.value = Math.round(track.volume * 100);
+                        updateRangeVisual(track.elements.volumeSlider);
                     }
                     if (track.elements.volumeValueEl) {
                         track.elements.volumeValueEl.textContent = Math.round(track.volume * 100);
                     }
                     if (track.elements.pitchSlider) {
                         track.elements.pitchSlider.value = track.pitch;
+                        updateRangeVisual(track.elements.pitchSlider);
                     }
                     if (track.elements.pitchValueEl) {
                         track.elements.pitchValueEl.textContent = track.pitch;
@@ -1471,6 +1630,7 @@
             const bpm = parseInt(bpmSlider.value, 10);
             bpmValue.textContent = bpm;
             Tone.Transport.bpm.value = bpm;
+            updateRangeVisual(bpmSlider);
         });
 
         addTrackBtn.addEventListener("click", () => {
@@ -1589,6 +1749,8 @@
 
             Tone.Transport.bpm.value = parseInt(bpmSlider.value, 10);
             scheduleLoop();
+            // visual update for bpm slider
+            updateRangeVisual(bpmSlider);
             setStatus("Stopped", false);
             // advanced mode is always on
             document.body.classList.add("advanced-on");
